@@ -1,0 +1,40 @@
+# --- Data and results (never committed; paths live in config/) ---
+data/
+results/
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.cram
+*.h5ad
+*.sif
+
+# --- Nextflow ---
+work/
+.nextflow*
+null/
+
+# --- Snakemake ---
+.snakemake/
+
+# --- Pixi (keep pixi.toml and pixi.lock tracked) ---
+.pixi/
+
+# --- Python / R / notebooks ---
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.Rhistory
+.RData
+.Rproj.user/
+
+# --- OS and editors ---
+.DS_Store
+.vscode/
+.positron/
+
+# --- Secrets and machine-specific settings ---
+.env
+.claude/settings.local.json
