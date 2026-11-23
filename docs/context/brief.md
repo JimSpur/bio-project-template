@@ -25,7 +25,7 @@ Can one small public repo give every later portfolio project the same reproducib
 - CI on a standard Linux runner builds the amd64 container and runs the Nextflow test profile, and is green.
 - The README states the question, how to run the tests in one command, and how to create a new project from the template.
 - `nf-core/demo` passes using the template's Pixi `nextflow`: Docker on a Mac, Apptainer on the PC.
-- James wrote the build code himself with Code as tutor (see `CLAUDE.md`), and the Hours table shows the real time taken.
+- James wrote the workflow logic and README himself with Code as tutor, and reviewed every plumbing file Code drafted (see `CLAUDE.md`). The Hours table shows the real time taken.
 - At close: build context archived under `docs/archive/phase-0/`, placeholders restored, "Template repository" flag set on GitHub, tag `v0.1`.
 
 ## Portfolio notes

@@ -6,9 +6,15 @@
 
 None yet. The Project adds a task here when James says he can do it himself.
 
+## 2026-11-23: Tutor mode split by code type
+
+- Decision: logic (analysis code, Nextflow processes and workflow blocks, Snakemake rules, analysis shell scripts, README and docs) is written by James with Code as tutor. Plumbing (`pixi.toml`, CI workflows, Dockerfile, `nextflow.config` profiles, `config/config.yaml` structure, `.gitignore`) is drafted by Code when James agrees; Code explains it and lists what to check, and James reviews and edits it. Replaces the 2026-11-20 rule that James writes all build code.
+- Why: Phase 0 aims at working-level familiarity, not mastery. Plumbing files are mostly syntax looked up in docs, so writing them by hand teaches little per hour; the logic is what employers will ask about.
+- Alternatives rejected: keeping full tutor mode (too slow for the learning gained); dropping tutor mode.
+
 ## 2026-11-20: Tutor mode for the whole Phase 0 build
 
-- Decision: James writes the build code himself (Pixi manifest, workflows, Dockerfile, CI). Claude Code acts as a tutor: it explains, reviews and suggests checks, and writes code only if James is stuck and asks. This is guidance, not a permission lock.
+- Decision: James writes the build code himself (Pixi manifest, workflows, Dockerfile, CI). Claude Code acts as a tutor: it explains, reviews and suggests checks, and writes code only if James is stuck and asks. This is guidance, not a permission lock. Superseded on 2026-11-23 by the split by code type.
 - Why: the goal is for James to learn to write the code for each project.
 - Alternatives rejected: Code builds the template (the original plan), hard permission deny rules on the code folders, the built-in Learning output style (Claude writes the routine code).
 
@@ -29,7 +35,7 @@ None yet. The Project adds a task here when James says he can do it himself.
 
 ## 2026-11-20: Hours are logged from the first Claude Code session
 
-- Decision: setup work before the first Claude Code session does not count towards the 40 h Phase 0 budget. Hours are recorded in the Hours table in `status.md` at `/handoff`, from what James reports.
+- Decision: setup work before the first Claude Code session does not count towards the 40 h Phase 0 budget. Hours are recorded in the Hours table in `status.md` at `/handoff`, from what James reports. Study hours count too and are logged by James in the hub (decided 2026-11-23).
 - Why: much of the earlier time went into building the Claude project itself.
 - Alternatives rejected: counting the machine installs and project setup.
 
