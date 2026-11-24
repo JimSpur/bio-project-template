@@ -8,11 +8,11 @@ rule write_greeting:
     output:
         "<outdir>/hello_rule_1.txt"
     shell:
-        "echo {params.txtstring} > {output}"        
+        "echo {params.txtstring:q} > {output}"
 rule transform_greeting:
     input:
         "<outdir>/hello_rule_1.txt"
     output:
         "<outdir>/hello_rule_2.txt"
     shell:
-        "tr '[:lower:]' '[:upper:]' < {input} > {output}"                
+        "tr '[:lower:]' '[:upper:]' < {input} > {output}"

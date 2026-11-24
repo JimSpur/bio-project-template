@@ -27,5 +27,10 @@
 - Question or proposal: record this in the design or decisions, so the switch happens at close (template) or at the start of Phase 1.
 - Impact if ignored: later projects start with `snakemake-minimal` and may miss plugins (executors, storage, reports) they expect.
 
+### 2026-11-24: Add an `.editorconfig` to the template
+- Context: `workflow/Snakefile` (`d5cd866`) has trailing spaces on lines 11 and 18 that James's editor (Positron) does not show; they were found with `cat -vet`. Trailing whitespace causes noisy diffs, breaks shell line continuations after `\`, and changes Markdown rendering.
+- Question or proposal: add a plumbing file `.editorconfig` at the repo root (for example `trim_trailing_whitespace = true`, `insert_final_newline = true`, `charset = utf-8`, with `trim_trailing_whitespace = false` for `*.md`), drafted by Code and reviewed by James. Optionally a CI check with `git diff --check`. Needs a place in `design.md` and the plumbing list in `CLAUDE.md`.
+- Impact if ignored: each project created from the template relies on per-editor settings; whitespace-only changes keep appearing in diffs.
+
 ## Resolved
 
