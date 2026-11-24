@@ -1,0 +1,18 @@
+configfile: "config/config.yaml"
+rule all:
+    input:
+        "<outdir>/hello_rule_2.txt"
+rule write_greeting:
+    params:
+        txtstring=config["txtstring"]
+    output:
+        "<outdir>/hello_rule_1.txt"
+    shell:
+        "echo {params.txtstring} > {output}"        
+rule transform_greeting:
+    input:
+        "<outdir>/hello_rule_1.txt"
+    output:
+        "<outdir>/hello_rule_2.txt"
+    shell:
+        "tr '[:lower:]' '[:upper:]' < {input} > {output}"                

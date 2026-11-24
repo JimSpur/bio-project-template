@@ -1,0 +1,11 @@
+# Settings for the Snakemake hello-world (workflow/Snakefile).
+# Paths are relative to the folder Snakemake is launched from (the repo root).
+
+# Path variables: used in the Snakefile as <name>.
+# Custom name, so the built-in <results> (= "results") is left unchanged.
+# Keep outputs under results/, which .gitignore covers.
+pathvars:
+  outdir: "results/snakemake/helloworld"
+
+# Greeting written by rule write_greeting.
+txtstring: "Hello World"
