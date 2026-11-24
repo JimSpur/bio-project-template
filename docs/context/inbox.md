@@ -32,5 +32,10 @@
 - Question or proposal: add a plumbing file `.editorconfig` at the repo root (for example `trim_trailing_whitespace = true`, `insert_final_newline = true`, `charset = utf-8`, with `trim_trailing_whitespace = false` for `*.md`), drafted by Code and reviewed by James. Optionally a CI check with `git diff --check`. Needs a place in `design.md` and the plumbing list in `CLAUDE.md`.
 - Impact if ignored: each project created from the template relies on per-editor settings; whitespace-only changes keep appearing in diffs.
 
+### 2026-11-24: Step 4 check needs a container before step 5 makes one
+- Context: design step 4 checks `pixi run test-nextflow` with `-profile test,docker`, but the template image (`containers/Dockerfile`) is only built in step 5. With the `docker` profile every process needs an image.
+- Question or proposal (James's choice, being followed): develop `main.nf` with no profile (local executor), then pass the step 4 check with a small public base image set in `nextflow.config`; step 5 replaces it with the template image. The hello-world processes only call `echo` and `tr`. Please record this in `design.md` step 4.
+- Impact if ignored: step 4's check cannot pass as written without reordering steps 4 and 5.
+
 ## Resolved
 
