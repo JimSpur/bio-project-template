@@ -1,0 +1,19 @@
+[workspace]
+channels = ['conda-forge', 'bioconda']
+name = "bio-project-template"
+platforms = ['osx-arm64', 'linux-64']
+version = "0.1.0"
+# Minimum Pixi that may read and write this workspace's pixi.lock.
+# Same version on the Studio, MacBook, PC and in CI.
+requires-pixi = ">=0.84.2"
+
+[tasks]
+# Hello-world checks. They need workflow/ and config/ files from steps 3 and 4.
+test-snakemake = "snakemake --snakefile workflow/Snakefile --configfile config/config.yaml --cores 2"
+test-nextflow = "nextflow run workflow/main.nf -profile test,docker"
+test = { depends-on = ["test-snakemake", "test-nextflow"] }
+
+[dependencies]
+# Exact builds are fixed in pixi.lock; these ranges say which updates are allowed.
+nextflow = "26.10.*"
+snakemake-minimal = "9.27.*"
