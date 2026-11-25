@@ -2,7 +2,7 @@
 
 <!-- Owner: Claude Code. Rewritten by /handoff at the end of each session. -->
 
-Last updated: 2026-11-24, machine: Studio, commit: 2af6321 (committed, not pushed: `main` is 1 ahead of `origin/main`). Uncommitted: `workflow/main.nf` (new, step 4 in progress) and `docs/context/inbox.md` (new step 4 entry).
+Last updated: 2026-11-25, machine: Studio, commit: f6ee037 (committed, not pushed: `main` is 2 ahead of `origin/main`). Step 4 done; step 5 next.
 
 ## Done
 
@@ -19,14 +19,16 @@ Last updated: 2026-11-24, machine: Studio, commit: 2af6321 (committed, not pushe
   - Snakemake 9.27.2 path variables (`<name>`, under `pathvars:`) confirmed in the installed source (`snakemake/pathvars.py`). A misspelled pathvar gives `UndefinedPathvarException` (James tested it).
   - Learned: rerun triggers (params saved in `.snakemake/` metadata; "Params have changed", "Code has changed", "Input files updated by another job"; `--list-changes params`), and bash word-splitting of unquoted placeholders. Spacing with `:q` was not re-run in Snakemake; Code checked only that `shlex.quote("Hello   World")` gives `'Hello   World'`.
   - James set `"editor.renderWhitespace": "trailing"` in Positron. A shared `.editorconfig` will live in another repo (James's decision).
-- Step 4 decisions (James): develop `main.nf` without a profile first, then pass the step 4 check with a small public base image, replaced by the template image in step 5 (inbox entry added). Nextflow outputs go to `results/nextflow/helloworld`.
+- Step 4 (Nextflow hello-world), committed in `5ba3d46` and `f6ee037`:
+  - `workflow/main.nf` (written by James): typed `params { greeting: String }` with no default; `sayHello` (`val greeting` → `echo "${greeting}"` → `hello_process_1.txt`) and `convertToUpper` (input staged as `path 'input_file_1'`, `tr` reads it directly → `hello_process_2.txt`); `publish:` plus `output { }` with `path 'helloworld'` and `mode 'copy'`.
+  - `workflow/nextflow.config` (drafted by Code, reviewed by James): `params.greeting = 'Hello World'`; `outputDir = 'results/nextflow'`; `process.container = 'ubuntu:24.04'` (temporary public image until step 5); profiles `test` (`resourceLimits` 2 CPUs, 4 GB, 1 h), `docker`, `docker_amd64` (`docker.runOptions = '--platform linux/amd64'`), `apptainer` (`autoMounts = true`). Keys for the template `CLAUDE.md`: `params.greeting`, `outputDir`.
+  - Config discovery confirmed: launched from the repo root, Nextflow parsed `workflow/nextflow.config` (`.nextflow.log`; no root or `~/.nextflow/config` exists). Nextflow reads `nextflow.config` from the project folder (where `main.nf` is) and from the launch folder, so no design change is needed.
+  - Learned: `Path`-typed params must exist (inputs); built-in `outputDir` / `-o` plus `path` in `output { }`; `$` and `"` still act inside bash double quotes. Code tested in scratch that an `env` input does not protect free text (Nextflow writes `export NAME="<value>"` unescaped into `.command.run`), while an `exec:` block writes the text verbatim. James kept `val greeting` with `echo "${greeting}"`; known limit: greetings containing `$`, `` ` ``, `"` or `\` are changed by bash.
+  - Decisions (James): step 4 check with a small public image (inbox entry); outputs in `results/nextflow/helloworld`.
 
 ## In progress
 
-- Step 4, `workflow/main.nf` (written by James, untracked). Uses the typed `params { }` block (log shows "script parser v2"), processes `sayHello` (`val greeting` → `hello_process_1.txt`, `echo '${greeting}'`) and `convertToUpper` (input staged as `path 'hello_process_1.txt'` → `hello_process_2.txt` via `tr`), and `publish:` plus an `output { }` block with `mode 'copy'`.
-  - Error found: `outputDir: Path = 'results/nextflow/helloworld'` in `params` failed with `Input file 'results/nextflow/helloworld' does not exist` (`TypeHelper.asPathType` in `.nextflow.log`): `Path` params are treated as inputs that must exist. James created the folder by hand and the run then completed, but outputs landed in `results/results/nextflow/helloworld/` (built-in `outputDir` default `results` plus the `path` in each output). Those stray files are gone at handoff.
-  - James's plan: set `outputDir` in `nextflow.config` and drop it from `params`; decide what `path` each output needs (check the "Workflow outputs" docs). James wants to refine `main.nf` further before the config.
-  - Known limit, accepted for the hello-world: `'${greeting}'` breaks if the greeting contains a single quote.
+- None.
 
 ## Blocked
 
@@ -42,7 +44,7 @@ Last updated: 2026-11-24, machine: Studio, commit: 2af6321 (committed, not pushe
 |---|---|---|---|
 | Step 2 check passed: `pixi install --locked` ok; Nextflow 26.10.7, Snakemake 9.27.2 | Studio | `.pixi/envs/default` (ignored) | `pixi install --locked`, `pixi run nextflow -version`, `pixi run snakemake --version`; `275e6ce` |
 | Step 3 final run after the `:q` and whitespace fixes: all jobs completed (reported by James); `hello_rule_1.txt` = `Hello World`, `hello_rule_2.txt` = `HELLO WORLD` (checked by Code with `cat -vet`) | Studio | `results/snakemake/helloworld/` (ignored) | `pixi run test-snakemake`, files as committed in `2af6321` |
-| Step 4 first run, not a passing check: completed after a hand-made output folder; outputs at the wrong path `results/results/nextflow/helloworld/` (seen by Code, since removed) | Studio | `work/` (ignored) | `pixi run nextflow run workflow/main.nf` (no profile), untracked `main.nf` on `2af6321` |
+| Step 4 check passed: `hello_process_1.txt` = `Hello World`, `hello_process_2.txt` = `HELLO WORLD` (checked by Code with `cat -vet`) | Studio | `results/nextflow/helloworld/` (ignored); `work/` (ignored) | `pixi run test-nextflow` (`-profile test,docker`, reported passed by James), then `nextflow run workflow/main.nf -profile test,docker_amd64` (log checked; both tasks' `.command.run` contain `--platform linux/amd64`); `main.nf` and `nextflow.config` as committed in `f6ee037` |
 
 ## Hours
 
@@ -58,8 +60,8 @@ Last updated: 2026-11-24, machine: Studio, commit: 2af6321 (committed, not pushe
 
 ## Next
 
-1. Push `2af6321` (and the next commit) when James chooses.
-2. Step 4: James refines `workflow/main.nf` (remove `outputDir` from `params`, decide the `path` in each output). Then Code drafts `workflow/nextflow.config` (`outputDir = 'results/nextflow/helloworld'`, `params` defaults, profiles `test`, `docker` with a small public image, `docker_amd64`, `apptainer`) for James to review. Check: `pixi run test-nextflow` passes, outputs land in `results/nextflow/helloworld/`, and Nextflow finds `workflow/nextflow.config` when launched from the repo root (confirm; if not, note the fix in `inbox.md`).
+1. Push the local commits (`main` is 2 ahead of `origin/main`) when James chooses.
+2. Step 5 (container, Code drafts): `containers/Dockerfile`, amd64, pinned base image, containing what the processes call (`echo`, `tr`). Choose the base image (for example `ubuntu`, `debian:*-slim`, `alpine`, micromamba). Check: builds on the Studio under Rosetta and on the PC natively. Then point `process.container` in `nextflow.config` at it instead of `ubuntu:24.04`.
 3. MacBook (next session there): `brew uninstall pixi`, install Pixi 0.84.2 with the official installer (look up its version option first), then check `which pixi` shows `~/.pixi/bin/pixi` and `pixi --version` shows 0.84.2.
 4. After Phase 0: switch `snakemake-minimal` to full `snakemake` in `pixi.toml` (James's decision; see inbox).
 5. Step 9 note (carried forward): no placeholder `data/`, `results/` or `work/` folders in the template. The README describes the layout instead: workflows create `results/`; data lives outside the repo, with its path in `config/config.yaml`; Nextflow `work/` goes in a scratch folder set with `-w` for real runs.

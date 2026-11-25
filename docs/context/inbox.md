@@ -37,5 +37,10 @@
 - Question or proposal (James's choice, being followed): develop `main.nf` with no profile (local executor), then pass the step 4 check with a small public base image set in `nextflow.config`; step 5 replaces it with the template image. The hello-world processes only call `echo` and `tr`. Please record this in `design.md` step 4.
 - Impact if ignored: step 4's check cannot pass as written without reordering steps 4 and 5.
 
+### 2026-11-25: How later projects install tools into the container
+- Context: step 5 `containers/Dockerfile` is `FROM ubuntu:24.04` with labels only; the hello-world needs nothing extra (`bash`, `ps`, `tr` are in the base image, checked with `docker run`). James chose to keep it minimal and decide the install method later.
+- Question or proposal: pick the pattern later projects follow to add tools: `apt-get` in the Dockerfile; micromamba with an environment file; or Pixi installing the `linux-64` environment from the same `pixi.lock` (official Pixi images exist), which keeps the container and the host environment in step. Record it in `design.md` before Phase 1.
+- Impact if ignored: each project invents its own method, and container tool versions can drift from `pixi.lock`.
+
 ## Resolved
 
