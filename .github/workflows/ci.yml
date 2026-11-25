@@ -1,0 +1,45 @@
+# CI: build the template image and run the hello-world tests on a standard
+# Linux x86 runner. No images are pushed (Phase 0).
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Read-only access to the repo is all this workflow needs.
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the run still in progress.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    # Standard x64 runner, same Ubuntu release as the PC.
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+
+    steps:
+      # Actions are pinned by commit SHA; the comment gives the release tag.
+      - name: Check out the repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Installs Pixi, then `pixi install --locked` from pixi.lock (the default
+      # when a lockfile exists), and caches the environment by the lockfile hash.
+      - name: Set up Pixi
+        uses: prefix-dev/setup-pixi@9936258fee697aff89b3fed6ca1f80a382ef694e # v0.11.3
+        with:
+          pixi-version: v0.84.2   # keep equal to requires-pixi in pixi.toml
+          locked: true
+          cache: true
+
+      # The runner is amd64, so this builds the amd64 image natively.
+      - name: Build the container image
+        run: docker build -t bio-project-template:dev containers/
+
+      # Snakemake hello-world, then Nextflow with -profile test,docker
+      # using the image built above.
+      - name: Run the tests
+        run: pixi run test
