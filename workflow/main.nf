@@ -1,21 +1,15 @@
 #!/usr/bin/env nextflow
 
 /*
-* Use echo to print 'Hello World!' to a file
-* Set the following keys in nextflow.config:
-
-params {
-    input = 'Hello World'
-}
-
-outputDir = "results/nextflow/"
+* Use echo to print 'Hello World' to a file
+* Default params set in nextflow.config
 */
 
 /*
  * Pipeline parameters
  */
 params {
-    input: String
+    greeting: String
 }
 
 process sayHello {
@@ -45,7 +39,7 @@ process convertToUpper {
 
     script:
     """
-    cat 'input_file_1' | tr '[:lower:]' '[:upper:]' > hello_process_2.txt
+    tr '[:lower:]' '[:upper:]' < 'input_file_1' > hello_process_2.txt
     """
 }
 
@@ -53,7 +47,7 @@ workflow {
 
     main:
     // emit a greeting
-    sayHello(params.input)
+    sayHello(params.greeting)
     // convert to uppercase
     convertToUpper(sayHello.out)
 
