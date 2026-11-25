@@ -2,14 +2,20 @@
 
 /*
 * Use echo to print 'Hello World!' to a file
+* Set the following keys in nextflow.config:
+
+params {
+    input = 'Hello World'
+}
+
+outputDir = "results/nextflow/"
 */
 
 /*
  * Pipeline parameters
  */
 params {
-    input: String = 'Hello World'
-    outputDir: Path = 'results/nextflow/helloworld'
+    input: String
 }
 
 process sayHello {
@@ -22,7 +28,7 @@ process sayHello {
 
     script:
     """
-    echo '${greeting}' > hello_process_1.txt
+    echo "${greeting}" > hello_process_1.txt
     """
 }
 
@@ -32,14 +38,14 @@ process sayHello {
 process convertToUpper {
 
     input:
-    path 'hello_process_1.txt'
+    path 'input_file_1'
 
     output:
     path 'hello_process_2.txt'
 
     script:
     """
-    cat 'hello_process_1.txt' | tr '[:lower:]' '[:upper:]' > hello_process_2.txt
+    cat 'input_file_1' | tr '[:lower:]' '[:upper:]' > hello_process_2.txt
     """
 }
 
@@ -58,11 +64,11 @@ workflow {
 
 output {
     first_output {
-        path { "${params.outputDir}" }
+        path 'helloworld'
         mode 'copy'
     }
     second_output {
-        path { "${params.outputDir}" }
+        path 'helloworld'
         mode 'copy'
     }
 }
