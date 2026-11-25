@@ -42,5 +42,15 @@
 - Question or proposal: pick the pattern later projects follow to add tools: `apt-get` in the Dockerfile; micromamba with an environment file; or Pixi installing the `linux-64` environment from the same `pixi.lock` (official Pixi images exist), which keeps the container and the host environment in step. Record it in `design.md` before Phase 1.
 - Impact if ignored: each project invents its own method, and container tool versions can drift from `pixi.lock`.
 
+### 2026-11-25: CI step order and the image name in `nextflow.config`
+- Context: design step 6 lists "run `pixi run test`, build the amd64 image, run the Nextflow test profile with it". `pixi run test` already includes `test-nextflow` (`-profile test,docker`), which needs the image, so `ci.yml` builds `bio-project-template:dev` first and runs `pixi run test` once (green, run 45719956294 at `20ad230`). `workflow/nextflow.config` now sets `process.container = 'bio-project-template:dev'`, a local tag that must be built on each machine (Studio, MacBook, PC, CI) before the Nextflow test.
+- Question or proposal: update design step 6 to this order. Decide later how projects made from the template name the image (the tag carries the template's name) and when `process.container` switches to the digest-pinned release image.
+- Impact if ignored: design and `ci.yml` disagree on the step order; new projects keep the template's image name.
+
+### 2026-11-25: Image label for the repo URL
+- Context: `containers/Dockerfile` has OCI labels for title, description and licence. `org.opencontainers.image.source` (the GitHub repo URL) was left out because it contains the GitHub username, and `CLAUDE.md` says no usernames in this public repo.
+- Question or proposal: does the public repo URL count as a username under that rule? If not, add the `source` label (it links images in GitHub's registry to the repo).
+- Impact if ignored: images have no link back to their source repo. Low impact in Phase 0.
+
 ## Resolved
 
