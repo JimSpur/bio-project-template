@@ -6,6 +6,24 @@
 
 None yet. The Project adds a task here when James says he can do it himself.
 
+## 2026-11-26: Remote access over Tailscale and `~/.zshenv` on every machine
+
+- Decision: plain SSH over Tailscale between all three machines, with aliases `studio`, `macbook` and `ubuntu-pc` that work at home and off site; `ubuntu-pc-lan` is the LAN-only fallback. The shared `~/.zshenv` is now linked on the Macs as well as the PC, with guarded Homebrew (`/opt/homebrew` on the Macs, Linuxbrew on the PC) and `typeset -U path PATH`, so non-interactive `ssh <host> '<command>'` finds `pixi`, `claude` and `brew` everywhere. Claude Code on the Studio may run checks on the MacBook with `ssh macbook`; it does not edit files there. Extends the 2026-11-25 PATH decision below.
+- Why: James can work on the Studio from the MacBook at home or away, Code can check the MacBook from the Studio, and the PC is reachable off site, all with one set of aliases.
+- Alternatives rejected: Tailscale SSH (its server needs the open-source `tailscaled` on macOS, not the app); a separate set of aliases for off-site use.
+
+## 2026-11-26: Python pinned to 3.13 for the template and every project
+
+- Decision: `python = "3.13.*"` in `pixi.toml`, replacing the `"3.14.*"` pin added in step 6b(a) (`1ef68ed`); done in design step 6c. Every project made from the template inherits it. Changing the Python minor version is a hub decision, made in the Dev Setup project first and followed by a deliberate relock. Resolves inbox entry "Python pinned to 3.14 in `pixi.toml`" (2026-11-26).
+- Why: without a pin the platforms resolved different Pythons (3.13 on `linux-64`, 3.14 on `osx-arm64`). 3.13 is chosen for stability: it has been out longer, so the heavier packages of later phases (scverse, bioconda tools) are more likely to have builds for it.
+- Alternatives rejected: keeping 3.14 (newest, more risk of missing builds later); letting each project choose its Python.
+
+## 2026-11-26: Pixi 0.85.0 on every machine and in CI
+
+- Decision: the 2026-11-25 rule stands: one Pixi version everywhere, upgraded together. The MacBook's switch to the official installer brought 0.85.0, so the Studio, the PC and CI move up to 0.85.0 and `requires-pixi` becomes `">=0.85.0"` (design step 6c). The comments in `pixi.toml` ("Same version on the Studio, MacBook, PC and in CI") and `ci.yml` ("keep equal to requires-pixi") stay. Resolves inbox entry "MacBook runs Pixi 0.85.0" (2026-11-26).
+- Why: a newer Pixi on one machine could write `pixi.lock` in a way the other machines and CI read differently. Moving everything up takes a few minutes and keeps the rule simple.
+- Alternatives rejected: treating `requires-pixi` as a minimum only, with newer versions allowed on some machines and CI on the minimum.
+
 ## 2026-11-25: Full Snakemake, `.editorconfig` and a whitespace check before the cross-machine run
 
 - Decision: new design step 6b, done before step 7. Replace `snakemake-minimal` with full `snakemake` and relock; add `.editorconfig` (Markdown exempt from whitespace trimming); add a CI step that fails on trailing whitespace. `.gitattributes` and `.editorconfig` join the plumbing list (Code drafts, James reviews). Resolves inbox entries "Switch to full Snakemake after Phase 0" (2026-11-24), "Add an `.editorconfig` to the template" (2026-11-24) and "`.gitattributes` is not in the plumbing list" (2026-11-24).
@@ -19,7 +37,7 @@ None yet. The Project adds a task here when James says he can do it himself.
 
 ## 2026-11-25: PATH for non-interactive SSH on the PC
 
-- Decision: a `~/.zshenv` on the PC adds `~/.pixi/bin` and `~/.local/bin` to the PATH, so `ssh ubuntu-pc '<command>'` finds `pixi` and `claude`. It is kept in the dotfiles repo and linked on the PC only. The guarded PATH lines in `.zshrc` stay for the Macs.
+- Decision: a `~/.zshenv` on the PC adds `~/.pixi/bin` and `~/.local/bin` to the PATH, so `ssh ubuntu-pc '<command>'` finds `pixi` and `claude`. It is kept in the dotfiles repo and linked on the PC only. The guarded PATH lines in `.zshrc` stay for the Macs. (Extended on 2026-11-26 to all three machines: see the entry above.)
 - Why: steps 7 and 8 run many commands over SSH. zsh reads `~/.zshenv` for every shell, including non-interactive ones; it does not read `~/.zshrc` for them.
 
 ## 2026-11-25: Container step order, image name and tools
