@@ -12,7 +12,7 @@ James is learning bioinformatics. What you do depends on the kind of code. If yo
 
 **Logic: James writes it, you tutor.** Analysis code (R and Python scripts and notebooks), Nextflow processes and workflow blocks (`workflow/main.nf`), Snakemake rules (`workflow/Snakefile`), shell scripts that do the analysis, and `README.md` and docs pages.
 
-**Plumbing: you draft it, James reviews it.** `pixi.toml` (dependencies, platforms, tasks), `.github/workflows/*.yml`, `containers/Dockerfile`, `workflow/nextflow.config` (profiles, executor and container settings), `config/config.yaml` structure, `.gitignore`. When a plumbing file is next in the design, offer a draft and write it into the file when James agrees. Then:
+**Plumbing: you draft it, James reviews it.** `pixi.toml` (dependencies, platforms, tasks), `.github/workflows/*.yml`, `containers/Dockerfile`, `workflow/nextflow.config` (profiles, executor and container settings), `config/config.yaml` structure, `.gitignore`, `.gitattributes`, `.editorconfig`. When a plumbing file is next in the design, offer a draft and write it into the file when James agrees. Then:
 - Explain each section in a line or two, and say why it is there.
 - List what James should check or change (versions, paths, names).
 - Leave the final edits to him and answer his questions. He owns the result.
@@ -64,11 +64,11 @@ If the design looks wrong or a decision needs changing, do not edit Project-owne
 
 ## Stack and conventions
 
-- Environments: Pixi (`pixi.toml`, `pixi.lock`; platforms `osx-arm64`, `linux-64`). Run tools with `pixi run`.
+- Environments: Pixi (`pixi.toml`, `pixi.lock`; platforms `osx-arm64`, `linux-64`). Run tools with `pixi run`. Pixi is installed with the official installer on every machine; its version changes only on purpose, together with `requires-pixi` and the CI `pixi-version`.
 - Languages: Python, R, bash. Pipelines: Nextflow and Snakemake under `workflow/`, settings under `config/`.
 - Containers: Docker (OrbStack) on the Macs, Apptainer on the Ubuntu PC. Release images are amd64, pinned by digest.
 - Large or raw data lives outside the repo and is never committed. Paths go in `config/`.
-- This repo is public. Public data only. Never commit secrets, tokens, IP addresses, usernames or machine-specific paths. Refer to the PC only by its SSH alias.
+- This repo is public. Public data only. Never commit secrets, tokens, IP addresses, local account names or machine-specific paths (such as `/Users/<name>/...`). The GitHub handle and the repo's own GitHub URL are public and may appear. Refer to the PC only by its SSH alias.
 - Workflow layout: `workflow/Snakefile`, `workflow/main.nf` and `workflow/nextflow.config`, `config/config.yaml`, `containers/Dockerfile`, `.github/workflows/`. Details in `docs/context/design.md`.
 - Keep everything generic: this is a template, so no project-specific content.
 
@@ -77,7 +77,7 @@ If the design looks wrong or a decision needs changing, do not edit Project-owne
 - Work happens in this clone on the Mac. The clone on the PC is an execution mirror: never edit it by hand.
 - SSH alias: `ubuntu-pc`. PC repo path: `~/repos/bio-project-template`. Large data, `work/` and big outputs stay on the PC.
 - To run: commit and push here, then `ssh ubuntu-pc 'cd ~/repos/bio-project-template && git pull --ff-only'`, then start the job in `tmux`. Run only pushed commits and record the commit hash.
-- Non-interactive SSH commands do not read `~/.zshrc`, so `pixi` is not on the PATH there. Use `~/.pixi/bin/pixi` or an interactive `tmux` session, and raise it in `docs/context/inbox.md` if it gets in the way.
+- Non-interactive SSH commands do not read `~/.zshrc`. A `~/.zshenv` on the PC puts `pixi` and `claude` on the PATH for them (decided 2026-11-25). Until `ssh ubuntu-pc 'command -v pixi'` prints a path, use `~/.pixi/bin/pixi` or an interactive `tmux` session.
 - Record each result in `docs/context/status.md` with host, commit and path. Bring back only small outputs (QC summaries, figures).
 - If Claude Code is run on the PC for debugging, commit anything worth keeping and push it. Do not edit Project-owned files there either.
 
@@ -86,6 +86,7 @@ If the design looks wrong or a decision needs changing, do not edit Project-owne
 If the real command differs from this list, say so in `docs/context/inbox.md` and the Project updates this file.
 
 - Install the locked environment: `pixi install --locked`
+- Build the test image (needed on every machine before the Nextflow test): `docker build --platform linux/amd64 -t bio-project-template:dev containers/` on a Mac; the same without `--platform` on the PC and in CI.
 - All tests: `pixi run test`
 - Snakemake hello-world: `pixi run snakemake --snakefile workflow/Snakefile --configfile config/config.yaml --cores 2`
 - Nextflow hello-world: `pixi run nextflow run workflow/main.nf -profile test,docker`
