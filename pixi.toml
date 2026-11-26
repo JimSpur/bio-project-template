@@ -16,4 +16,8 @@ test = { depends-on = ["test-snakemake", "test-nextflow"] }
 [dependencies]
 # Exact builds are fixed in pixi.lock; these ranges say which updates are allowed.
 nextflow = "26.10.*"
-snakemake-minimal = "9.27.*"
+# Full Snakemake (adds reports, PEP and pandas support) rather than snakemake-minimal.
+snakemake = "9.27.*"
+# Same Python minor on every platform; without a pin linux-64 resolved 3.13
+# and osx-arm64 3.14.
+python = "3.14.*"
