@@ -11,17 +11,23 @@
 - Question or proposal: <...>
 - Impact if ignored: <...> -->
 
-### 2026-11-26: Python pinned to 3.14 in `pixi.toml`
-- Context: in step 6b(a), Code found that the committed `pixi.lock` resolved Python 3.13.18 on `linux-64` (PC, CI) and 3.14.10 on `osx-arm64` (Macs). Nothing forced 3.13: with `python = "3.14.*"` both platforms solve and every compiled package has a `py314` build (tested in a scratch copy). James chose to pin `python = "3.14.*"`, committed in `1ef68ed` together with full Snakemake. Step 7 confirmed Python 3.14.10 on the PC and the Studio.
-- Question or proposal: record the pin in `design.md` (step 2 or 6b) and `decisions.md`. Projects made from the template inherit it; raising the minor version later is a deliberate relock, like the Pixi version.
-- Impact if ignored: the design does not mention a pin that every later project inherits; a future edit might drop it and bring back different Pythons per platform.
+### 2026-11-26: `docker` not found over non-interactive SSH on the MacBook
+- Context: in the step 7 re-run, `ssh macbook 'command -v docker'` found nothing. OrbStack links `docker` in `/usr/local/bin` and `~/.orbstack/bin`; neither is on the non-interactive PATH (`~/.local/bin`, `~/.pixi/bin`, `/opt/homebrew/bin`, `/opt/homebrew/sbin`, `/usr/bin`, `/bin`, `/usr/sbin`, `/sbin`). Code ran the test with `PATH=/usr/local/bin:$PATH` set for that run only. OrbStack was also stopped (`orb status`: Stopped); Code started it with `orb start`. Not checked on the Studio over SSH.
+- Question or proposal: add a guarded `/usr/local/bin` (or `~/.orbstack/bin`) entry to the shared `~/.zshenv` in the dotfiles repo, so `ssh macbook '<command>'` (and `ssh studio`) find `docker` as they find `pixi`, `claude` and `brew`. Note in `CLAUDE.md` that OrbStack must be running before a remote Docker run (`orb start`).
+- Impact if ignored: any remote `pixi run test` or Docker build on a Mac fails with `command not found: docker`, or with a Docker socket error when OrbStack is stopped.
 
-### 2026-11-26: MacBook runs Pixi 0.85.0
-- Context: the Homebrew Pixi on the MacBook was replaced with the official installer, which installed 0.85.0. The Studio and the PC run 0.84.2, and CI uses `pixi-version: v0.84.2`. James decided to keep 0.85.0 ("Require pixi is for greater or equal to 0.84.2"). Step 7 on the MacBook passed with the same `pixi.lock` hash. This goes against the 2026-11-25 decision (same version on all machines, upgrades deliberate on all three with `requires-pixi` and CI `pixi-version` in the same commit).
-- Question or proposal: update the decision so that `requires-pixi` is the minimum, machines may run a newer Pixi, and CI stays on the minimum. Or keep the decision and plan a deliberate upgrade of all machines and CI. The comments in `pixi.toml` ("Same version on the Studio, MacBook, PC and in CI") and `ci.yml` ("keep equal to requires-pixi") follow whichever is chosen.
-- Impact if ignored: `pixi lock` or `pixi add` run on the MacBook may write `pixi.lock` differently from the other machines and CI; the decision and the machines disagree.
+### 2026-11-26: No Apptainer cache directory on the PC
+- Context: step 8 on the PC (`-profile test,apptainer`) passed, with one warning in `.nextflow.log`: "Apptainer cache directory has not been defined -- Remote image will be stored in the path: ~/scratch/nfcore/work/singularity". `NXF_APPTAINER_CACHEDIR` is unset on the PC.
+- Question or proposal: choose one shared image cache on the PC's internal disk (for example `~/.apptainer/cache/nxf` or a folder under `~/scratch`), and set it either with `NXF_APPTAINER_CACHEDIR` in the shared `~/.zshenv` (PC only) or with `apptainer.cacheDir` in the template's `apptainer` profile. Record which in `design.md`.
+- Impact if ignored: every new `-w` folder downloads and converts each image again, and the images are deleted with `work/`. Slow and wasteful for real projects with large images.
 
 ## Resolved
+
+### 2026-11-26: Python pinned to 3.14 in `pixi.toml`
+- Outcome (CLAUDE.md, design step 2 and 6c, decisions.md 2026-11-26): pinned to `python = "3.13.*"` instead, for stability; changing it is a hub decision. Done in `0d0466f`.
+
+### 2026-11-26: MacBook runs Pixi 0.85.0
+- Outcome (design step 6c, decisions.md 2026-11-26): the same-version rule stands; the Studio, PC and CI moved up to 0.85.0 and `requires-pixi = ">=0.85.0"`. Done in `0d0466f`.
 
 ### 2026-11-23: Pixi install method differs between machines
 - Outcome (decisions.md 2026-11-25): official installer on every machine, upgrades deliberate. Homebrew Pixi removed from the MacBook on 2026-11-26. See the 2026-11-26 entry on the MacBook version.
