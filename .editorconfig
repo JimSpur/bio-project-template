@@ -21,7 +21,7 @@ trim_trailing_whitespace = false
 insert_final_newline = unset
 trim_trailing_whitespace = unset
 
-# Indentation: James's choice. The suggestions below match the files as they are now.
+# Indentation:
 # [{Snakefile,*.smk,*.py,*.nf,*.config}]
 # indent_style = space
 # indent_size = 4

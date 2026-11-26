@@ -6,8 +6,8 @@
 */
 
 /*
- * Pipeline parameters
- */
+* Pipeline parameters
+*/
 params {
     greeting: String
 }
@@ -27,8 +27,8 @@ process sayHello {
 }
 
 /*
- * Use a text replacement tool to convert the greeting to uppercase
- */
+* Use a text replacement tool to convert the greeting to uppercase
+*/
 process convertToUpper {
 
     input:

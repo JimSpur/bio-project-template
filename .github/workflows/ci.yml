@@ -26,6 +26,12 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Fails on trailing whitespace or blank lines at the end of a file in any
+      # tracked file. Comparing against git's empty tree treats every line as new.
+      # Markdown is exempt (.gitattributes); pixi.lock is skipped as -diff.
+      - name: Check whitespace
+        run: git diff --check 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+
       # Installs Pixi, then `pixi install --locked` from pixi.lock (the default
       # when a lockfile exists), and caches the environment by the lockfile hash.
       - name: Set up Pixi
