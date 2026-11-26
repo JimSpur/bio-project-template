@@ -77,7 +77,8 @@ If the design looks wrong or a decision needs changing, do not edit Project-owne
 - Work happens in this clone on the Mac. The clone on the PC is an execution mirror: never edit it by hand.
 - SSH alias: `ubuntu-pc`. PC repo path: `~/repos/bio-project-template`. Large data, `work/` and big outputs stay on the PC.
 - To run: commit and push here, then `ssh ubuntu-pc 'cd ~/repos/bio-project-template && git pull --ff-only'`, then start the job in `tmux`. Run only pushed commits and record the commit hash.
-- Non-interactive SSH commands do not read `~/.zshrc`. A shared `~/.zshenv`, linked on all three machines, puts `pixi`, `claude` and `brew` on the PATH for them (PC since 2026-11-25, Macs since 2026-11-26).
+- Non-interactive SSH commands do not read `~/.zshrc`. A shared `~/.zshenv`, linked on all three machines, puts `pixi`, `claude` and `brew` on the PATH for them (PC since 2026-11-25, Macs since 2026-11-26), and `docker` on the Macs (OrbStack's `~/.orbstack/bin`, 2026-11-26).
+- Docker on a Mac over SSH: OrbStack starts at login on both Macs. Before a remote Docker run, check `ssh <mac> 'orb status'`; if it says Stopped, run `orb start` there and say so in `status.md`.
 - SSH aliases go over Tailscale, so they work at home and off site: `studio`, `macbook`, `ubuntu-pc`; `ubuntu-pc-lan` is the LAN-only fallback. Use `ssh macbook '<command>'` for checks only (versions, `git status`, a test run), never to edit files there; it answers only while the MacBook is awake.
 - Record each result in `docs/context/status.md` with host, commit and path. Bring back only small outputs (QC summaries, figures).
 - If Claude Code is run on the PC for debugging, commit anything worth keeping and push it. Do not edit Project-owned files there either.

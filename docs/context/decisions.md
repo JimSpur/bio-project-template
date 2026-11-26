@@ -6,6 +6,12 @@
 
 None yet. The Project adds a task here when James says he can do it himself.
 
+## 2026-11-26: `docker` over SSH on the Macs, and the Apptainer image cache on the PC
+
+- Decision: the shared `~/.zshenv` gets two more guarded lines. (1) `~/.orbstack/bin` on the PATH, so `ssh macbook '<command>'` and `ssh studio '<command>'` find `docker`. OrbStack starts at login on both Macs (set by James 2026-11-26), and `CLAUDE.md` says to check `orb status` before a remote Docker run. (2) `NXF_APPTAINER_CACHEDIR=$HOME/.apptainer/nxf-cache`, guarded by `command -v apptainer` so only the PC sets it. The template's `apptainer` profile sets no `cacheDir`. Resolves inbox entries "`docker` not found over non-interactive SSH on the MacBook" (2026-11-26) and "No Apptainer cache directory on the PC" (2026-11-26).
+- Why: (1) OrbStack links `docker` in `/usr/local/bin` and `~/.orbstack/bin`, and a non-interactive shell gets neither. `~/.orbstack/bin` is chosen because it holds only OrbStack's tools, so the line can't pull in anything else. Starting at login removes the "OrbStack stopped" failure. (2) Without a cache, every new `-w` folder pulls and converts each image again and deletes it with `work/`. The cache path is a machine setting: a public template must not hold machine paths, and each HPC cluster has its own place for it. It sits on the internal disk but outside `~/scratch`, so cleaning scratch keeps the images.
+- Alternatives rejected: `/usr/local/bin` on the PATH (also picks up anything else installed there); `apptainer.cacheDir` in the template's `nextflow.config`; a cache under `~/scratch`.
+
 ## 2026-11-26: Remote access over Tailscale and `~/.zshenv` on every machine
 
 - Decision: plain SSH over Tailscale between all three machines, with aliases `studio`, `macbook` and `ubuntu-pc` that work at home and off site; `ubuntu-pc-lan` is the LAN-only fallback. The shared `~/.zshenv` is now linked on the Macs as well as the PC, with guarded Homebrew (`/opt/homebrew` on the Macs, Linuxbrew on the PC) and `typeset -U path PATH`, so non-interactive `ssh <host> '<command>'` finds `pixi`, `claude` and `brew` everywhere. Claude Code on the Studio may run checks on the MacBook with `ssh macbook`; it does not edit files there. Extends the 2026-11-25 PATH decision below.
