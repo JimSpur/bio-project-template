@@ -5,7 +5,7 @@ platforms = ['osx-arm64', 'linux-64']
 version = "0.1.0"
 # Minimum Pixi that may read and write this workspace's pixi.lock.
 # Same version on the Studio, MacBook, PC and in CI.
-requires-pixi = ">=0.84.2"
+requires-pixi = ">=0.85.0"
 
 [tasks]
 # Hello-world checks. They need workflow/ and config/ files from steps 3 and 4.
@@ -20,4 +20,4 @@ nextflow = "26.10.*"
 snakemake = "9.27.*"
 # Same Python minor on every platform; without a pin linux-64 resolved 3.13
 # and osx-arm64 3.14.
-python = "3.14.*"
+python = "3.13.*"
