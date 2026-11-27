@@ -2,13 +2,13 @@
 
 <!-- Owner: Claude Code. Rewritten by /handoff at the end of each session. -->
 
-Last updated: 2026-11-26, machine: Studio, commit: 0d0466f (pushed, `main` up to date with `origin/main`). Steps 6c, 7 (re-run) and 8 done; step 9 next.
+Last updated: 2026-11-27, machine: MacBook, commit: 25ac9d2 (`main` up to date with `origin/main`, clean tree). Steps 1-8 done; step 9 (README) in progress: outline agreed, no text written yet.
 
 ## Done
 
 - Step 1 (scaffold). `.gitignore` drafted by Code, reviewed by James, committed in `ae3e293`. `.pixi/` ignores the whole Pixi folder; `.pixi/config.toml` is not tracked.
 - Pixi: official installer (`~/.pixi/bin/pixi`) on all three machines, 0.85.0 on the Studio, MacBook and PC (upgraded by James in step 6c; `pixi --version` checked by Code on all three over SSH, 2026-11-26).
-- Non-interactive SSH: `pixi`, `git` and `tmux` found on the PC and the MacBook (used by Code for the step 7 re-run). `docker` is not found on the MacBook over non-interactive SSH; see inbox.
+- Non-interactive SSH: `pixi`, `git` and `tmux` found on the PC and the MacBook (used by Code for the step 7 re-run). After the 2026-11-26 `~/.zshenv` decision (decisions.md), checked by Code on 2026-11-27: `docker` resolves to `~/.orbstack/bin/docker` in a non-interactive shell on the MacBook (local `zsh -c`) and over `ssh studio`; `orb status` is `Running` on both; `ssh ubuntu-pc` prints `NXF_APPTAINER_CACHEDIR=~/.apptainer/nxf-cache`. Not yet checked: `ssh macbook 'command -v docker'` from another machine, and a Nextflow run on the PC using the cache.
 - Step 2 (Pixi environment), committed in `275e6ce`, changed in steps 6b and 6c: `pixi.toml` with `requires-pixi = ">=0.85.0"`, platforms `osx-arm64` and `linux-64`, tasks `test-snakemake`, `test-nextflow`, `test` (depends on both); `pixi.lock` (lock version 7); `.gitattributes` from `pixi init`.
 - Step 3 (Snakemake hello-world), written by James, committed in `d5cd866` and `2af6321`: `workflow/Snakefile` (`write_greeting` with `{params.txtstring:q}`, `transform_greeting` with `tr`, `rule all`); `config/config.yaml` keys `pathvars.outdir = "results/snakemake/helloworld"` and `txtstring = "Hello World"`.
 - Step 4 (Nextflow hello-world), committed in `5ba3d46`, `f6ee037`, `2379f9e`: `workflow/main.nf` (written by James; typed `params { greeting: String }`, processes `sayHello` and `convertToUpper`, `publish:` / `output { }` to `helloworld`); `workflow/nextflow.config` (drafted by Code, reviewed by James): `params.greeting = 'Hello World'`, `outputDir = 'results/nextflow'`, `process.container = 'bio-project-template:dev'`, profiles `test`, `docker`, `docker_amd64`, `apptainer`. Keys for the template `CLAUDE.md`: `params.greeting`, `outputDir`. Known limit accepted by James: greetings containing `$`, `` ` ``, `"` or `\` are changed by bash.
@@ -25,7 +25,13 @@ Last updated: 2026-11-26, machine: Studio, commit: 0d0466f (pushed, `main` up to
 
 ## In progress
 
-- None.
+- Step 9 (README, James writes; Code tutors). `README.md` still has 2 lines (title and one-line description). Outline agreed with James on 2026-11-27, checked by Code against `brief.md` success criteria and design step 9:
+  - `# bio-project-template`, with the question in one sentence under the title.
+  - `## Quick start`: the one-command test. Open point for James: the steps a fresh clone needs before `pixi run test` (see `CLAUDE.md` Commands: install, image build).
+  - `## Create new project from template`: clone, build the image, rename the `bio-project-template:dev` tag (in `workflow/nextflow.config`, `.github/workflows/ci.yml`, README), and the repository layout (workflows create `results/`; data outside the repo, path in `config/config.yaml`; `work/` in a scratch folder set with `-w`).
+  - `## Platform specific configuration`: Mac amd64 emulation and the expected platform-mismatch warning; the template sets no Apptainer cache, each machine sets `NXF_APPTAINER_CACHEDIR`.
+  - `## Test with pixi run`: nf-core/demo smoke-test commands and notes. Open point for James: overlap with `Quick start`; a heading such as `Smoke test with nf-core/demo` was suggested.
+  - `## Claude Code process`, `## License` (`LICENSE` exists).
 
 ## Blocked
 
@@ -59,6 +65,7 @@ Last updated: 2026-11-26, machine: Studio, commit: 0d0466f (pushed, `main` up to
 | Step 8 Studio: 8 of 8 tasks, "Pipeline completed successfully" (pasted by James); trace has 8 rows; log shows Nextflow 26.10.7, `revision: 1.2.0` (checked by Code). Peak RSS: MULTIQC 1 GB (highest), FASTQC 420-571 MB | Studio | `~/scratch/nfcore/results/demo/` (outside the repo) | `pixi run -m ~/repos/bio-project-template nextflow run nf-core/demo -profile test,docker,emulate_amd64 --outdir ~/scratch/nfcore/results/demo -w ~/scratch/nfcore/work -r 1.2.0`, from `~/scratch/nfcore`; template `0d0466f` |
 | Step 8 MacBook: 8 of 8 (pasted by James); trace 8 tasks `COMPLETED`, exit 0; Nextflow 26.10.7, `revision: 1.2.0`, `-profile test,docker,emulate_amd64`; no WARN lines in `.nextflow.log` (checked by Code over SSH) | MacBook | `~/scratch/nfcore/results/demo/` | same command as the Studio (run by James); template `0d0466f` |
 | Step 8 PC: completed successfully (reported by James); trace 8 tasks `COMPLETED`, exit 0; Nextflow 26.10.7, `revision: 1.2.0`, `-profile test,apptainer`; one WARN: Apptainer cache directory not defined, images stored in `~/scratch/nfcore/work/singularity` (checked by Code over SSH; see inbox) | PC | `~/scratch/nfcore/results/demo/` | same command with `-profile test,apptainer`, in `tmux` (run by James); template `0d0466f` |
+| `~/.zshenv` 2026-11-26 lines in effect: `docker` = `~/.orbstack/bin/docker` and `orb status` `Running` on the MacBook and the Studio; `NXF_APPTAINER_CACHEDIR=~/.apptainer/nxf-cache` on the PC (checked by Code) | MacBook (local), Studio and PC (over SSH) | none | `zsh -c 'command -v docker; orb status'`, `ssh studio 'command -v docker; orb status'`, `ssh ubuntu-pc 'echo $NXF_APPTAINER_CACHEDIR'`; `25ac9d2` |
 
 ## Hours
 
@@ -74,10 +81,12 @@ Last updated: 2026-11-26, machine: Studio, commit: 0d0466f (pushed, `main` up to
 | 2026-11-25 | 3 | 9.75 | Step 4 finished (`nextflow.config`), step 5 Dockerfile built on Studio and PC, PC Nextflow test, step 6 CI green |
 | 2026-11-26 | 1.5 | 11.25 | /sync-context, step 6b (full Snakemake, Python pin, `.editorconfig`, CI whitespace check), step 7 on PC, Studio and MacBook |
 | 2026-11-26 (second) | 2.5 | 13.75 | /sync-context, step 6c (Pixi 0.85.0, Python 3.13, relock), step 7 re-run over SSH, nf-core intro, step 8 on all three, reading run outputs |
+| 2026-11-27 | 0.5 | 14.25 | MacBook: pull, /sync-context (OrbStack PATH, Apptainer cache decisions), step 9 README outline |
 
 ## Next
 
-1. Step 9 (README, James). Notes carried forward: no placeholder `data/`, `results/` or `work/` folders in the template; the README describes the layout (workflows create `results/`, data outside the repo with its path in `config/config.yaml`, Nextflow `work/` in a scratch folder set with `-w` for real runs). Design step 9 adds: build the image on each machine first, the expected platform-mismatch warning on the Macs, and renaming the `bio-project-template:dev` tag in the create-a-project steps. Possibly mention `.editorconfig` (Positron may need the EditorConfig extension; not checked), the local whitespace check `git diff --check 4b825dc642cb6eb9a060e54bf8d69288fbee4904`, and the step 8 smoke-test commands (`pixi run -m <repo> nextflow run nf-core/demo -r 1.2.0 …`, `emulate_amd64` on the Macs, `apptainer` on the PC).
-2. Optional cleanup (James's choice): `~/scratch/nfcore` on the Studio, MacBook and PC; `~/step7b-test.log` on the PC and MacBook; `orb stop` on the MacBook if OrbStack should not stay running.
+1. Step 9 (README, James): write the question line and `## Quick start` first, then ask Code to read them. Follow the outline under In progress. No placeholder `data/`, `results/` or `work/` folders in the template. Possibly mention `.editorconfig` (Positron may need the EditorConfig extension; not checked), the local whitespace check `git diff --check 4b825dc642cb6eb9a060e54bf8d69288fbee4904`, and the step 8 smoke-test commands (`pixi run -m <repo> nextflow run nf-core/demo -r 1.2.0 …`, `emulate_amd64` on the Macs, `apptainer` on the PC; commands are in the Results table). Design check: a fresh clone follows the README and the tests pass.
+2. Optional cleanup (James's choice): `~/scratch/nfcore` on the Studio, MacBook and PC; `~/step7b-test.log` on the PC and MacBook. (OrbStack now starts at login on both Macs by decision, so the earlier `orb stop` item is dropped.)
 3. Optional (curiosity, not a design step): repeat the smoke test on one machine to see run-to-run spread of FASTQC peak RSS. Across machines it was 420-571 MB with no pattern (MacBook, also emulated, was lowest for 2 of 3 samples), so emulation is not shown to raise memory.
 4. Note: folders only reach another machine once they hold a tracked file.
+5. For the Project: the two Open inbox entries of 2026-11-26 (`docker` over SSH, Apptainer cache) are decided in decisions.md 2026-11-26 and the fix is checked (see Results); they can move to Resolved.
